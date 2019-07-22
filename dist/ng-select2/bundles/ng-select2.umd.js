@@ -87,7 +87,7 @@
                 this.propagateChange(newValue);
             }
             if (changes['value'] && changes['value'].previousValue !== changes['value'].currentValue) {
-                var newValue = changes['value'].currentValue;
+                var newValue = this.sanitizeNull(changes['value'].currentValue);
                 this.setElementValue(newValue);
                 this.valueChanged.emit({
                     value: newValue,
@@ -121,7 +121,7 @@
             this.element.on('select2:select select2:unselect', function (e) {
                 e.params.originalEvent.stopPropagation();
                 // const newValue: string = (e.type === 'select2:unselect') ? '' : this.element.val();
-                var newValue = _this.element.val();
+                var newValue = _this.sanitizeNull(_this.element.val());
                 _this.valueChanged.emit({
                     value: newValue,
                     data: _this.element.select2('data'),
@@ -182,6 +182,12 @@
             return selectedIndex !== -1
                 ? this.element[0].options[selectedIndex].value
                 : null;
+        };
+        NgSelect2Component.prototype.sanitizeNull = function (value) {
+            if (value === 'null') {
+                return null;
+            }
+            return value;
         };
         NgSelect2Component.prototype.setElementValue = function (newValue) {
             // this.zone.run(() => {

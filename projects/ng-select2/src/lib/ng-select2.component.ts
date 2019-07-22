@@ -111,8 +111,7 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
 
     if (changes['value'] && changes['value'].previousValue !== changes['value'].currentValue) {
 
-      const newValue: string = changes['value'].currentValue;
-
+      const newValue: string = this.sanitizeNull(changes['value'].currentValue);
       this.setElementValue(newValue);
       this.valueChanged.emit({
         value: newValue,
@@ -153,8 +152,7 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
     this.element.on('select2:select select2:unselect', (e: any) => {
       e.params.originalEvent.stopPropagation();
       // const newValue: string = (e.type === 'select2:unselect') ? '' : this.element.val();
-      const newValue = this.element.val();
-
+      const newValue = this.sanitizeNull(this.element.val());
       this.valueChanged.emit({
         value: newValue,
         data: this.element.select2('data'),
@@ -224,6 +222,15 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
       ? this.element[0].options[selectedIndex].value
       : null;
   }
+
+  private sanitizeNull(value: any): any {
+    if (value === 'null') {
+      return null;
+    }
+
+    return value;
+  }
+
   private setElementValue(newValue: string | string[]) {
 
     // this.zone.run(() => {
