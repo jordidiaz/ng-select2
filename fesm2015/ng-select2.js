@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 
 var NgSelect2Component_1;
 let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
-    // private style = `CSS`;
     constructor(renderer, zone, _element) {
         this.renderer = renderer;
         this.zone = zone;
@@ -45,7 +44,7 @@ let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
         }
         if (changes['data'] && JSON.stringify(changes['data'].previousValue) !== JSON.stringify(changes['data'].currentValue)) {
             this.initPlugin();
-            const newValue = this.value;
+            const newValue = this.currentValue ? this.currentValue : this.value;
             this.setElementValue(newValue);
             this.propagateChange(newValue);
         }
@@ -81,6 +80,7 @@ let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
             this.setElementValue(this.value);
         }
         this.element.on('select2:select select2:unselect', (e) => {
+            e.params.originalEvent.stopPropagation();
             // const newValue: string = (e.type === 'select2:unselect') ? '' : this.element.val();
             const newValue = this.element.val();
             this.valueChanged.emit({
@@ -105,6 +105,8 @@ let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
         }
         // If select2 already initialized remove him and remove all tags inside
         if (this.element.hasClass('select2-hidden-accessible') === true) {
+            // Store current selected value
+            this.currentValue = this.getCurrentValue();
             this.element.select2('destroy');
             this.renderer.setProperty(this.selector.nativeElement, 'innerHTML', '');
         }
@@ -134,6 +136,12 @@ let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
             this.element.select2(options);
         }
         this.renderer.setProperty(this.selector.nativeElement, 'disabled', this.disabled);
+    }
+    getCurrentValue() {
+        const selectedIndex = this.element[0].options.selectedIndex;
+        return selectedIndex !== -1
+            ? this.element[0].options[selectedIndex].value
+            : null;
     }
     setElementValue(newValue) {
         // this.zone.run(() => {
