@@ -70,6 +70,8 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
   private check = false;
   // private style = `CSS`;
 
+  private currentValue: any;
+
   constructor(private renderer: Renderer2, public zone: NgZone, public _element: ElementRef) {
   }
 
@@ -102,7 +104,7 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
     if (changes['data'] && JSON.stringify(changes['data'].previousValue) !== JSON.stringify(changes['data'].currentValue)) {
       this.initPlugin();
 
-      const newValue: string | string[] = this.value;
+      const newValue = this.currentValue ? this.currentValue : this.value;
       this.setElementValue(newValue);
       this.propagateChange(newValue);
     }
@@ -149,6 +151,7 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
     }
 
     this.element.on('select2:select select2:unselect', (e: any) => {
+      e.params.originalEvent.stopPropagation();
       // const newValue: string = (e.type === 'select2:unselect') ? '' : this.element.val();
       const newValue = this.element.val();
 
@@ -178,6 +181,8 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
 
     // If select2 already initialized remove him and remove all tags inside
     if (this.element.hasClass('select2-hidden-accessible') === true) {
+      // Store current selected value
+      this.currentValue = this.getCurrentValue();
       this.element.select2('destroy');
       this.renderer.setProperty(this.selector.nativeElement, 'innerHTML', '');
     }
@@ -213,7 +218,12 @@ export class NgSelect2Component implements AfterViewInit, OnChanges, OnDestroy, 
 
     this.renderer.setProperty(this.selector.nativeElement, 'disabled', this.disabled);
   }
-
+  private getCurrentValue() {
+    const selectedIndex = this.element[0].options.selectedIndex;
+    return selectedIndex !== -1
+      ? this.element[0].options[selectedIndex].value
+      : null;
+  }
   private setElementValue(newValue: string | string[]) {
 
     // this.zone.run(() => {

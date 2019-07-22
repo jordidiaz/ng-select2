@@ -42,7 +42,6 @@
     }
 
     var NgSelect2Component = /** @class */ (function () {
-        // private style = `CSS`;
         function NgSelect2Component(renderer, zone, _element) {
             this.renderer = renderer;
             this.zone = zone;
@@ -83,7 +82,7 @@
             }
             if (changes['data'] && JSON.stringify(changes['data'].previousValue) !== JSON.stringify(changes['data'].currentValue)) {
                 this.initPlugin();
-                var newValue = this.value;
+                var newValue = this.currentValue ? this.currentValue : this.value;
                 this.setElementValue(newValue);
                 this.propagateChange(newValue);
             }
@@ -120,6 +119,7 @@
                 this.setElementValue(this.value);
             }
             this.element.on('select2:select select2:unselect', function (e) {
+                e.params.originalEvent.stopPropagation();
                 // const newValue: string = (e.type === 'select2:unselect') ? '' : this.element.val();
                 var newValue = _this.element.val();
                 _this.valueChanged.emit({
@@ -145,6 +145,8 @@
             }
             // If select2 already initialized remove him and remove all tags inside
             if (this.element.hasClass('select2-hidden-accessible') === true) {
+                // Store current selected value
+                this.currentValue = this.getCurrentValue();
                 this.element.select2('destroy');
                 this.renderer.setProperty(this.selector.nativeElement, 'innerHTML', '');
             }
@@ -174,6 +176,12 @@
                 this.element.select2(options);
             }
             this.renderer.setProperty(this.selector.nativeElement, 'disabled', this.disabled);
+        };
+        NgSelect2Component.prototype.getCurrentValue = function () {
+            var selectedIndex = this.element[0].options.selectedIndex;
+            return selectedIndex !== -1
+                ? this.element[0].options[selectedIndex].value
+                : null;
         };
         NgSelect2Component.prototype.setElementValue = function (newValue) {
             // this.zone.run(() => {

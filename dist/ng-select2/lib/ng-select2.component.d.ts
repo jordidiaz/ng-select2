@@ -18,6 +18,7 @@ export declare class NgSelect2Component implements AfterViewInit, OnChanges, OnD
     valueChanged: EventEmitter<{}>;
     private element;
     private check;
+    private currentValue;
     constructor(renderer: Renderer2, zone: NgZone, _element: ElementRef);
     ngDoCheck(): void;
     ngOnInit(): void;
@@ -25,6 +26,7 @@ export declare class NgSelect2Component implements AfterViewInit, OnChanges, OnD
     ngAfterViewInit(): void;
     ngOnDestroy(): void;
     private initPlugin;
+    private getCurrentValue;
     private setElementValue;
     writeValue(value: any): void;
     propagateChange: (value: any) => void;
