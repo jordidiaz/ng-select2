@@ -49,7 +49,7 @@ let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
             this.propagateChange(newValue);
         }
         if (changes['value'] && changes['value'].previousValue !== changes['value'].currentValue) {
-            const newValue = changes['value'].currentValue;
+            const newValue = this.sanitizeNull(changes['value'].currentValue);
             this.setElementValue(newValue);
             this.valueChanged.emit({
                 value: newValue,
@@ -82,7 +82,7 @@ let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
         this.element.on('select2:select select2:unselect', (e) => {
             e.params.originalEvent.stopPropagation();
             // const newValue: string = (e.type === 'select2:unselect') ? '' : this.element.val();
-            const newValue = this.element.val();
+            const newValue = this.sanitizeNull(this.element.val());
             this.valueChanged.emit({
                 value: newValue,
                 data: this.element.select2('data'),
@@ -142,6 +142,12 @@ let NgSelect2Component = NgSelect2Component_1 = class NgSelect2Component {
         return selectedIndex !== -1
             ? this.element[0].options[selectedIndex].value
             : null;
+    }
+    sanitizeNull(value) {
+        if (value === 'null') {
+            return null;
+        }
+        return value;
     }
     setElementValue(newValue) {
         // this.zone.run(() => {
